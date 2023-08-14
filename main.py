@@ -9,9 +9,7 @@ def preprocess(arg):
 
 def lexical_analysis(s):
     for i in range(len(s)):
-        if s[i] == "\n":
-            s[i] = " "
-        elif not (s[i].isnumeric() or s[i] in valid_operations or s[i] == " "):
+        if not (s[i].isnumeric() or s[i] in valid_operations or s[i] == " "):
             raise Exception("Invalid input")
 
 def syntactic_analysis(s):

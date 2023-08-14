@@ -5,6 +5,8 @@ valid_operations = {'+': operator.add, '-': operator.sub}
 
 def preprocess(arg):
     string = arg
+    string = string.replace("\\n","")
+    print(string)
     return string
 
 def lexical_analysis(s):

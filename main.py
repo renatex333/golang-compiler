@@ -6,12 +6,13 @@ valid_operations = {'+': operator.add, '-': operator.sub}
 def preprocess(arg):
     string = arg
     string = string.replace("\\n","")
-    print(string)
     return string
 
 def lexical_analysis(s):
     for i in range(len(s)):
-        if not (s[i].isnumeric() or s[i] in valid_operations or s[i] == " "):
+        if (s[i].isnumeric()) or (s[i] in valid_operations) or (s[i] == " "):
+            continue
+        else:
             raise Exception(f"Invalid input: {s[i]} in {repr(s)}")
 
 def syntactic_analysis(s):

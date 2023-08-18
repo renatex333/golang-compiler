@@ -6,6 +6,7 @@ valid_operations = {'+': operator.add, '-': operator.sub}
 def preprocess(arg):
     string = arg
     string = string.replace("\\n","")
+    string = string.replace("\n","")
     return string
 
 def lexical_analysis(s):
@@ -13,7 +14,7 @@ def lexical_analysis(s):
         if (s[i].isnumeric()) or (s[i] in valid_operations) or (s[i] == " "):
             continue
         else:
-            raise Exception(f"Invalid input: {s[i]} in {repr(s)}")
+            raise Exception(f"Invalid input: {repr(s[i])} in {repr(s)}")
 
 def syntactic_analysis(s):
     pass
@@ -23,7 +24,7 @@ def semantic_analysis(s):
         # Checa se um operador está entre dois números
         if s[i] in valid_operations:
             if i == 0 or i == len(s)-1:
-                raise Exception(f"Invalid input: {s[i]} in {repr(s)}")
+                raise Exception(f"Invalid input: {repr(s[i])} in {repr(s)}")
             
             for j in range(i+1, len(s)):
                 if s[j] == " ":
@@ -31,9 +32,9 @@ def semantic_analysis(s):
                 if s[j].isnumeric():
                     break
                 if s[j] in valid_operations:
-                    raise Exception(f"Invalid input: {s[i]} in {repr(s)}")
+                    raise Exception(f"Invalid input: {repr(s[i])} in {repr(s)}")
             else:
-                raise Exception(f"Invalid input: {s[i]} in {repr(s)}")
+                raise Exception(f"Invalid input: {repr(s[i])} in {repr(s)}")
             
             for j in range(i-1, -1, -1):
                 if s[j] == " ":
@@ -41,9 +42,9 @@ def semantic_analysis(s):
                 if s[j].isnumeric():
                     break
                 if s[j] in valid_operations:
-                    raise Exception(f"Invalid input: {s[i]} in {repr(s)}")
+                    raise Exception(f"Invalid input: {repr(s[i])} in {repr(s)}")
             else:
-                raise Exception(f"Invalid input: {s[i]} in {repr(s)}")
+                raise Exception(f"Invalid input: {repr(s[i])} in {repr(s)}")
             
         # Checa se não há espaços entre os números
         elif s[i] == " " and s[i-1].isnumeric():
@@ -53,7 +54,7 @@ def semantic_analysis(s):
                 if s[j] in valid_operations:
                     break
                 if s[j].isnumeric():
-                    raise Exception(f"Invalid input: {s[i]} in {repr(s)}")
+                    raise Exception(f"Invalid input: {repr(s[i])} in {repr(s)}")
 
 def calculate(s):
     operands = []

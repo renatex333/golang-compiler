@@ -14,49 +14,54 @@ class Tokenizer:
     def select_next(self):
         token_type = None
         token_value = None
-        if self.source[self.position].isnumeric():
-            token_type = "INTEGER"
+        if self.position == len(self.source):
+            token_type = "EOF"
+            token_value = ""
+            self.next = Token(token_type, token_value)
+        elif self.source[self.position].isnumeric():
+            token_type = "INT"
             number = str(self.source[self.position])
-            while self.source[self.position+1].isnumeric():
-                number += str(self.source[self.position+1])
+            self.position += 1
+            while self.position < len(self.source) and self.source[self.position].isnumeric():
+                number += str(self.source[self.position])
                 self.position += 1
-            token_value = int(self.source[self.position])
+            token_value = int(number)
+            self.next = Token(token_type, token_value)
         elif self.source[self.position] == "+":
             token_type = "PLUS"
-            token_value = self.source[self.position]
+            token_value = "+"
             self.position += 1
+            self.next = Token(token_type, token_value)
         elif self.source[self.position] == "-":
             token_type = "MINUS"
-            token_value = self.source[self.position]
+            token_value = "-"
             self.position += 1
+            self.next = Token(token_type, token_value)
         elif self.source[self.position] == " ":
             self.position += 1
             self.select_next()
-        elif self.position == len(self.source):
-            token_type = "EOF"
-            token_value = ""
         else:
             raise Exception("Invalid input")
-        self.next = Token(token_type, token_value)
 
 class Parser:
     tokenizer = None
     @staticmethod
     def parse_expression():
         result = None
-        if Parser.tokenizer.next.type == "INTEGER":
+        Parser.tokenizer.select_next()
+        if Parser.tokenizer.next.type == "INT":
             result = Parser.tokenizer.next.value
             Parser.tokenizer.select_next()
-            while Parser.tokenizer.next.type == "PLUS" or Parser.tokenizer.next.type == "MINUS":
+            while (Parser.tokenizer.next.type == "PLUS") or (Parser.tokenizer.next.type == "MINUS"):
                 if Parser.tokenizer.next.type == "PLUS":
                     Parser.tokenizer.select_next()
-                    if Parser.tokenizer.next.type == "INTEGER":
+                    if Parser.tokenizer.next.type == "INT":
                         result += Parser.tokenizer.next.value
                     else:
                         raise Exception("Invalid input")
                 elif Parser.tokenizer.next.type == "MINUS":
                     Parser.tokenizer.select_next()
-                    if Parser.tokenizer.next.type == "INTEGER":
+                    if Parser.tokenizer.next.type == "INT":
                         result -= Parser.tokenizer.next.value
                     else:
                         raise Exception("Invalid input")
@@ -72,7 +77,7 @@ class Parser:
         Parser.tokenizer = Tokenizer(code, 0, None)
         result = Parser.parse_expression()
         if Parser.tokenizer.next.type != "EOF":
-            raise Exception("Invalid input")
+            raise Exception(f"Invalid input error: Last Token type is not EOF, is {Parser.tokenizer.next.type}")
         return result
 
 def main(argv):

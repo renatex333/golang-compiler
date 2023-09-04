@@ -5,3 +5,12 @@
 ## Diagrama sintático
 
 ![diagrama sintatico](./diagrama-sintatico.png)
+
+## EBNF
+
+```
+EXPRESSION = TERM, {("+" | "-"), TERM} ;
+TERM = NUMBER, {("*" | "/"), NUMBER} ;
+NUMBER = DIGIT, {DIGIT} ;
+DIGIT = 0 | 1 | ... | 9 ;
+```

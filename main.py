@@ -61,7 +61,7 @@ class Tokenizer:
             self.position += 1
             self.next = Token(token_type, token_value)
         else:
-            raise Exception(f"Invalid Token Error: Token {self.source[self.position]} is not a valid token.")
+            raise Exception(f"Invalid Token Error: Token {self.source[self.position]} is not a valid token. Located at position {self.position}.")
 
 class Parser:
     tokenizer = None
@@ -72,7 +72,7 @@ class Parser:
         Parser.tokenizer.select_next()
         result = Parser.parse_expression()
         if Parser.tokenizer.next.type != "EOF":
-            raise Exception(f"Invalid Input Error: Last Token type is not EOF, is {Parser.tokenizer.next.type}.")
+            raise Exception(f"Invalid Input Error: Last Token type is not EOF, is {Parser.tokenizer.next.type} = {Parser.tokenizer.next.value}. Located at position {Parser.tokenizer.position}.")
         return result
 
     @staticmethod
@@ -95,17 +95,10 @@ class Parser:
         while (Parser.tokenizer.next.type == "MULT") or (Parser.tokenizer.next.type == "DIV"):
             if Parser.tokenizer.next.type == "MULT":
                 Parser.tokenizer.select_next()
-                if Parser.tokenizer.next.type == "INT":
-                    result *= Parser.tokenizer.next.value
-                else:
-                    raise Exception(f"Invalid Input Error: Expected an integer after operation. Got '{Parser.tokenizer.next.value}' instead.")
+                result *= Parser.parse_factor()
             elif Parser.tokenizer.next.type == "DIV":
                 Parser.tokenizer.select_next()
-                if Parser.tokenizer.next.type == "INT":
-                    result //= Parser.tokenizer.next.value
-                else:
-                    raise Exception(f"Invalid Input Error: Expected an integer after operation. Got '{Parser.tokenizer.next.value}' instead.")
-            Parser.tokenizer.select_next()
+                result //= Parser.parse_factor()
         return result
 
     @staticmethod
@@ -124,10 +117,10 @@ class Parser:
             Parser.tokenizer.select_next()
             result = Parser.parse_expression()
             if Parser.tokenizer.next.type != "RIGHTPARENTESIS":
-                raise Exception(f"Invalid Input Error: Expected ')' after expression. Got '{Parser.tokenizer.next.value}' instead.")
+                raise Exception(f"Invalid Input Error: Expected ')' after expression. Got '{Parser.tokenizer.next.value}' instead. Located at position {Parser.tokenizer.position}.")
             Parser.tokenizer.select_next()
         else:
-            raise Exception(f"Invalid Input Error: Expected an integer, '+', '-', or '('. Got '{Parser.tokenizer.next.value}' instead.")
+            raise Exception(f"Invalid Input Error: Expected an integer, '+', '-', or '('. Got '{Parser.tokenizer.next.value}' instead. Located at position {Parser.tokenizer.position}.")
         return result
 def main(argv):
     result = Parser.run(argv[1])
@@ -135,5 +128,3 @@ def main(argv):
 
 if __name__ == "__main__":
     main(sys.argv)
-
-

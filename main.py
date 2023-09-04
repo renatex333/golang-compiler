@@ -14,7 +14,7 @@ class Tokenizer:
     def select_next(self):
         token_type = None
         token_value = None
-        if self.position == len(self.source):
+        if self.position == len(self.source) or self.source[self.position] == "#":
             token_type = "EOF"
             token_value = ""
             self.next = Token(token_type, token_value)

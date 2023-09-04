@@ -9,8 +9,9 @@
 ## EBNF
 
 ```
-EXPRESSION = TERM, {("+" | "-"), TERM} ;
-TERM = NUMBER, {("*" | "/"), NUMBER} ;
-NUMBER = DIGIT, {DIGIT} ;
+EXPRESSION = TERM, { ("+" | "-"), TERM } ;
+TERM = FACTOR, { ("*" | "/"), FACTOR } ;
+FACTOR = ("+" | "-") FACTOR | "(" EXPRESSION ")" | NUMBER ;
+NUMBER = DIGIT, { DIGIT } ;
 DIGIT = 0 | 1 | ... | 9 ;
 ```

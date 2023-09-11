@@ -12,7 +12,6 @@ class Parser:
         with open(f"{filename}", 'r') as file:
             lines = file.readlines()
             code = PrePro.filter(lines)
-            print(code)
         Parser.tokenizer = Tokenizer(code, 0, None)
         Parser.tokenizer.select_next()
         root = Parser.parse_expression()

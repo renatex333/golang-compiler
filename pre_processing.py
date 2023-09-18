@@ -4,5 +4,4 @@ class PrePro:
         code = ""
         for line in lines:
             code += line.split("//")[0]
-        code = code.replace("\n", "")
         return code

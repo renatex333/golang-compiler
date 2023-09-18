@@ -9,9 +9,15 @@
 ## EBNF
 
 ```
+BLOCK = { STATEMENT };
+STATEMENT = ( λ | ASSIGNMENT | PRINT), "\n" ;
+ASSIGNMENT = IDENTIFIER, "=", EXPRESSION ;
+PRINT = "Println", "(", EXPRESSION, ")" ;
 EXPRESSION = TERM, { ("+" | "-"), TERM } ;
 TERM = FACTOR, { ("*" | "/"), FACTOR } ;
-FACTOR = ("+" | "-") FACTOR | "(" EXPRESSION ")" | NUMBER ;
+FACTOR = (("+" | "-"), FACTOR) | NUMBER | "(", EXPRESSION, ")" | IDENTIFIER ;
+IDENTIFIER = LETTER, { LETTER | DIGIT | "_" } ;
 NUMBER = DIGIT, { DIGIT } ;
-DIGIT = 0 | 1 | ... | 9 ;
+LETTER = ( a | ... | z | A | ... | Z ) ;
+DIGIT = ( 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 0 ) ;
 ```

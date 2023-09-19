@@ -3,5 +3,8 @@ class PrePro:
     def filter(lines):
         code = ""
         for line in lines:
-            code += line.split("//")[0]
+            new_line = line.split("//")[0]
+            if new_line[-1] != "\n":
+                new_line += "\n"
+            code += new_line
         return code

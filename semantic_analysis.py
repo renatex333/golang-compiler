@@ -31,6 +31,7 @@ class Parser:
         if Parser.tokenizer.next.type == "NEWLINE":
             Parser.tokenizer.select_next()
             root = NoOp("NoOp", [])
+            return root
         elif Parser.tokenizer.next.type == "IDENTIFIER":
             identifier = Identifier(Parser.tokenizer.next.value, [])
             Parser.tokenizer.select_next()

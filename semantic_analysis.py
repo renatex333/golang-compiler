@@ -1,6 +1,6 @@
 from pre_processing import PrePro
 from lexical_analysis import Tokenizer
-from syntactic_analysis import BinOp, UnOp, IntVal, Identifier, Assignment, Print, Block, NoOp
+from syntactic_analysis import BinOp, UnOp, IntVal, Identifier, Assignment, Print, Scan, If, For, Block, Program, NoOp
 
 class Parser:
     tokenizer = None
@@ -12,19 +12,34 @@ class Parser:
             code = PrePro.filter(lines)
         Parser.tokenizer = Tokenizer(code, 0, None)
         Parser.tokenizer.select_next()
-        root = Parser.parse_block()
+        root = Parser.parse_program()
         if Parser.tokenizer.next.type != "EOF":
             raise Exception(f"Invalid Input Error: Last Token type is not EOF, is {Parser.tokenizer.next.type} = {Parser.tokenizer.next.value}.")
         return root
     
     @staticmethod
-    def parse_block():
+    def parse_program():
         children = []
         while Parser.tokenizer.next.type != "EOF":
             children.append(Parser.parse_statement())
-        root = Block("Block", children)
+        root = Program("Program", children)
         return root
     
+    @staticmethod
+    def parse_block():
+        if Parser.tokenizer.next.type != "LEFTBRACE":
+            raise Exception(f"Invalid Input Error: Expected '{{' after 'main'. Got '{Parser.tokenizer.next.value}' instead.")
+        Parser.tokenizer.select_next()
+        if Parser.tokenizer.next.type != "NEWLINE":
+            raise Exception(f"Invalid Input Error: Expected newline ('\\n') after '{{'. Got '{Parser.tokenizer.next.value}' instead.")
+        Parser.tokenizer.select_next()
+        children = []
+        while Parser.tokenizer.next.type != "RIGHTBRACE":
+            children.append(Parser.parse_statement())
+        Parser.tokenizer.select_next()
+        root = Block("Block", children)
+        return root
+
     @staticmethod
     def parse_statement():
         root = None
@@ -38,19 +53,93 @@ class Parser:
             if Parser.tokenizer.next.type != "ASSIGNMENT":
                 raise Exception(f"Invalid Input Error: Expected '=' after identifier. Got '{Parser.tokenizer.next.value}' instead.")
             Parser.tokenizer.select_next()
-            root = Assignment("=", [identifier, Parser.parse_expression()])
+            root = Assignment("=", [identifier, Parser.parse_boolean_expression()])
         elif Parser.tokenizer.next.type == "PRINT":
             Parser.tokenizer.select_next()
             if Parser.tokenizer.next.type != "LEFTPARENTESIS":
                 raise Exception(f"Invalid Input Error: Expected '(' after 'Println'. Got '{Parser.tokenizer.next.value}' instead.")
             Parser.tokenizer.select_next()
-            root = Print("Println", [Parser.parse_expression()])
+            root = Print("Println", [Parser.parse_boolean_expression()])
             if Parser.tokenizer.next.type != "RIGHTPARENTESIS":
                 raise Exception(f"Invalid Input Error: Expected ')' after expression. Got '{Parser.tokenizer.next.value}' instead.")
             Parser.tokenizer.select_next()
+        elif Parser.tokenizer.next.type == "IF":
+            Parser.tokenizer.select_next()
+            children = []
+            condition = Parser.parse_boolean_expression()
+            children.append(condition)
+            block = Parser.parse_block()
+            children.append(block)
+            if Parser.tokenizer.next.type == "ELSE":
+                Parser.tokenizer.select_next()
+                else_block = Parser.parse_block()
+                children.append(else_block)
+            root = If("If", children)
+        elif Parser.tokenizer.next.type == "FOR":
+            Parser.tokenizer.select_next()
+            children = []
+            if Parser.tokenizer.next.type != "IDENTIFIER":
+                raise Exception(f"Invalid Input Error: Expected identifier after 'For'. Got '{Parser.tokenizer.next.value}' instead.")
+            identifier = Identifier(Parser.tokenizer.next.value, [])
+            Parser.tokenizer.select_next()
+            if Parser.tokenizer.next.type != "ASSIGNMENT":
+                raise Exception(f"Invalid Input Error: Expected '=' after identifier. Got '{Parser.tokenizer.next.value}' instead.")
+            Parser.tokenizer.select_next()
+            init = Assignment("=", [identifier, Parser.parse_boolean_expression()])
+            children.append(init)
+            if Parser.tokenizer.next.type != "SEMICOLON":
+                raise Exception(f"Invalid Input Error: Expected ';' after identifier. Got '{Parser.tokenizer.next.value}' instead.")
+            Parser.tokenizer.select_next()
+            condition = Parser.parse_boolean_expression()
+            children.append(condition)
+            if Parser.tokenizer.next.type != "SEMICOLON":
+                raise Exception(f"Invalid Input Error: Expected ';' after identifier. Got '{Parser.tokenizer.next.value}' instead.")
+            Parser.tokenizer.select_next()
+            if Parser.tokenizer.next.type != "IDENTIFIER":
+                raise Exception(f"Invalid Input Error: Expected identifier after 'For'. Got '{Parser.tokenizer.next.value}' instead.")
+            identifier = Identifier(Parser.tokenizer.next.value, [])
+            Parser.tokenizer.select_next()
+            if Parser.tokenizer.next.type != "ASSIGNMENT":
+                raise Exception(f"Invalid Input Error: Expected '=' after identifier. Got '{Parser.tokenizer.next.value}' instead.")
+            Parser.tokenizer.select_next()
+            increment = Assignment("=", [identifier, Parser.parse_boolean_expression()])
+            children.append(increment)
+            block = Parser.parse_block()
+            children.append(block)
+            root = For("For", children)
         if Parser.tokenizer.next.type != "NEWLINE":
             raise Exception(f"Invalid Statement: Expected newline ('\\n') after statement. Got '{Parser.tokenizer.next.value}' instead.")
         Parser.tokenizer.select_next()
+        return root
+
+    @staticmethod
+    def parse_boolean_expression():
+        root = Parser.parse_boolean_term()
+        while Parser.tokenizer.next.type == "OR":
+            Parser.tokenizer.select_next()
+            root = BinOp("||", [root, Parser.parse_boolean_term()])
+        return root
+    
+    @staticmethod
+    def parse_boolean_term():
+        root = Parser.parse_relational_expression()
+        while Parser.tokenizer.next.type == "AND":
+            Parser.tokenizer.select_next()
+            root = BinOp("&&", [root, Parser.parse_relational_expression()])
+        return root
+    
+    @staticmethod
+    def parse_relational_expression():
+        root = Parser.parse_expression()
+        if Parser.tokenizer.next.type == "EQUALS":
+            Parser.tokenizer.select_next()
+            root = BinOp("==", [root, Parser.parse_expression()])
+        elif Parser.tokenizer.next.type == "GREATER":
+            Parser.tokenizer.select_next()
+            root = BinOp(">", [root, Parser.parse_expression()])
+        elif Parser.tokenizer.next.type == "LESS":
+            Parser.tokenizer.select_next()
+            root = BinOp("<", [root, Parser.parse_expression()])
         return root
 
     @staticmethod
@@ -92,12 +181,24 @@ class Parser:
         elif Parser.tokenizer.next.type == "MINUS":
             Parser.tokenizer.select_next()
             root = UnOp("-", [Parser.parse_factor()])
+        elif Parser.tokenizer.next.type == "NOT":
+            Parser.tokenizer.select_next()
+            root = UnOp("!", [Parser.parse_factor()])
         elif Parser.tokenizer.next.type == "LEFTPARENTESIS":
             Parser.tokenizer.select_next()
-            root = Parser.parse_expression()
+            root = Parser.parse_boolean_expression()
             if Parser.tokenizer.next.type != "RIGHTPARENTESIS":
                 raise Exception(f"Invalid Input Error: Expected ')' after expression. Got '{Parser.tokenizer.next.value}' instead.")
             Parser.tokenizer.select_next()
+        elif Parser.tokenizer.next.type == "SCAN":
+            Parser.tokenizer.select_next()
+            if Parser.tokenizer.next.type != "LEFTPARENTESIS":
+                raise Exception(f"Invalid Input Error: Expected '(' after 'Scanln'. Got '{Parser.tokenizer.next.value}' instead.")
+            Parser.tokenizer.select_next()
+            if Parser.tokenizer.next.type != "RIGHTPARENTESIS":
+                raise Exception(f"Invalid Input Error: Expected ')' after expression. Got '{Parser.tokenizer.next.value}' instead.")
+            Parser.tokenizer.select_next()
+            root = Scan("Scan", [])
         else:
             raise Exception(f"Invalid Input Error: Expected an integer, identifier, '+', '-', or '('. Got '{Parser.tokenizer.next.value}' instead.")
         return root

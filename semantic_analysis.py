@@ -200,5 +200,5 @@ class Parser:
             Parser.tokenizer.select_next()
             root = Scan("Scan", [])
         else:
-            raise Exception(f"Invalid Input Error: Expected an integer, identifier, '+', '-', or '('. Got '{Parser.tokenizer.next.value}' instead.")
+            raise Exception(f"Invalid Input Error: Expected an integer, identifier, '+', '-', '!', '(' or 'Scanln'. Got '{Parser.tokenizer.next.value}' instead.")
         return root

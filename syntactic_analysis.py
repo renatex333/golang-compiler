@@ -36,6 +36,16 @@ class BinOp(Node):
             return self.children[0].evaluate(symbol_table) * self.children[1].evaluate(symbol_table)
         elif self.value == "/":
             return self.children[0].evaluate(symbol_table) // self.children[1].evaluate(symbol_table)
+        elif self.value == "||":
+            return self.children[0].evaluate(symbol_table) or self.children[1].evaluate(symbol_table)
+        elif self.value == "&&":
+            return self.children[0].evaluate(symbol_table) and self.children[1].evaluate(symbol_table)
+        elif self.value == "==":
+            return self.children[0].evaluate(symbol_table) == self.children[1].evaluate(symbol_table)
+        elif self.value == ">":
+            return self.children[0].evaluate(symbol_table) > self.children[1].evaluate(symbol_table)
+        elif self.value == "<":
+            return self.children[0].evaluate(symbol_table) < self.children[1].evaluate(symbol_table)
 
 class UnOp(Node):
     def __init__(self, value: str, children: list[Node]):
@@ -46,6 +56,8 @@ class UnOp(Node):
             return self.children[0].evaluate(symbol_table)
         elif self.value == "-":
             return -self.children[0].evaluate(symbol_table)
+        elif self.value == "!":
+            return not self.children[0].evaluate(symbol_table)
 
 class IntVal(Node):
     def __init__(self, value: str, children: list[Node]):
@@ -75,7 +87,42 @@ class Print(Node):
     def evaluate(self, symbol_table: SymbolTable):
         print(self.children[0].evaluate(symbol_table))
 
+class Scan(Node):
+    def __init__(self, value: str, children: list[Node]):
+        super().__init__(value, children)
+
+    def evaluate(self, symbol_table: SymbolTable):
+        return int(input())
+
+class If(Node):
+    def __init__(self, value: str, children: list[Node]):
+        super().__init__(value, children)
+
+    def evaluate(self, symbol_table: SymbolTable):
+        if self.children[0].evaluate(symbol_table):
+            self.children[1].evaluate(symbol_table)
+        elif len(self.children) > 2:
+            self.children[2].evaluate(symbol_table)
+
+class For(Node):
+    def __init__(self, value: str, children: list[Node]):
+        super().__init__(value, children)
+
+    def evaluate(self, symbol_table: SymbolTable):
+        self.children[0].evaluate(symbol_table)
+        while self.children[1].evaluate(symbol_table):
+            self.children[3].evaluate(symbol_table)
+            self.children[2].evaluate(symbol_table)
+
 class Block(Node):
+    def __init__(self, value: str, children: list[Node]):
+        super().__init__(value, children)
+
+    def evaluate(self, symbol_table: SymbolTable):
+        for child in self.children:
+            child.evaluate(symbol_table)
+
+class Program(Node):
     def __init__(self, value: str, children: list[Node]):
         super().__init__(value, children)
 

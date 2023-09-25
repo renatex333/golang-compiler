@@ -91,12 +91,12 @@ class Tokenizer:
         elif self.source[self.position] == "|" and self.source[self.position + 1] == "|":
             token_type = "OR"
             token_value = "||"
-            self.position += 1
+            self.position += 2
             self.next = Token(token_type, token_value)
         elif self.source[self.position] == "&" and self.source[self.position + 1] == "&":
             token_type = "AND"
             token_value = "&&"
-            self.position += 1
+            self.position += 2
             self.next = Token(token_type, token_value)
         elif self.source[self.position] == "!":
             token_type = "NOT"
@@ -132,5 +132,4 @@ class Tokenizer:
             self.position += 1
             self.select_next()
         else:
-            raise Exception(
-                f"Invalid Token Error: Token {repr(self.source[self.position])} is not a valid token. Located at position {self.position}.")
+            raise Exception(f"Invalid Token Error: Token {repr(self.source[self.position])} is not a valid token. Located at position {self.position}.")

@@ -9,13 +9,20 @@
 ## EBNF
 
 ```
-BLOCK = { STATEMENT };
-STATEMENT = ( λ | ASSIGNMENT | PRINT), "\n" ;
-ASSIGNMENT = IDENTIFIER, "=", EXPRESSION ;
-PRINT = "Println", "(", EXPRESSION, ")" ;
+PROGRAM = { STATEMENT } ;
+BLOCK = "{", "\n", { STATEMENT }, "}" ;
+STATEMENT = ( λ | ASSIGN | PRINT | IF | FOR ), "\n" ;
+ASSIGN = IDENTIFIER, "=", BOOLEAN EXPRESSION ;
+PRINT = "Println", "(", BOOLEAN EXPRESSION, ")" ;
+IF = "if", BOOLEAN EXPRESSION, BLOCK, { "else", BLOCK } ;
+FOR = "for", ASSIGN, ";", BOOLEAN EXPRESSION, ";", ASSIGN, BLOCK ;
+BOOLEAN EXPRESSION = BOOLEAN TERM, { "||" BOOLEAN TERM } ;
+BOOLEAN TERM = RELATIONAL EXPRESSION, { "&&", RELATIONAL EXPRESSION } ;
+RELATIONAL EXPRESSION = EXPRESSION, { ("==" | ">" | "<"), EXPRESSION } ;
 EXPRESSION = TERM, { ("+" | "-"), TERM } ;
 TERM = FACTOR, { ("*" | "/"), FACTOR } ;
-FACTOR = (("+" | "-"), FACTOR) | NUMBER | "(", EXPRESSION, ")" | IDENTIFIER ;
+FACTOR = NUMBER | IDENTIFIER | (("+" | "-" | "!"), FACTOR) | "(", BOOLEAN EXPRESSION, ")" | SCAN ;
+SCAN = "Scanln", "(", ")" ;
 IDENTIFIER = LETTER, { LETTER | DIGIT | "_" } ;
 NUMBER = DIGIT, { DIGIT } ;
 LETTER = ( a | ... | z | A | ... | Z ) ;

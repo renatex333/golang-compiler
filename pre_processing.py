@@ -9,5 +9,6 @@ class PrePro:
                 continue
             if new_line[-1] != "\n":
                 new_line += "\n"
+            new_line = new_line.replace("\t", "")
             code += new_line
         return code

@@ -35,6 +35,14 @@ class Tokenizer:
                 self.position += 1
             if token_value == "Println":
                 token_type = "PRINT"
+            elif token_value == "Scanln":
+                token_type = "SCAN"
+            elif token_value == "if":
+                token_type = "IF"
+            elif token_value == "else":
+                token_type = "ELSE"
+            elif token_value == "for":
+                token_type = "FOR"
             self.next = Token(token_type, token_value)
         elif self.source[self.position] == "+":
             token_type = "PLUS"
@@ -75,10 +83,54 @@ class Tokenizer:
             token_type = "ASSIGNMENT"
             token_value = "="
             self.position += 1
+            if self.source[self.position] == "=":
+                token_type = "EQUALS"
+                token_value = "=="
+                self.position += 1
+            self.next = Token(token_type, token_value)
+        elif self.source[self.position] == "|" and self.source[self.position + 1] == "|":
+            token_type = "OR"
+            token_value = "||"
+            self.position += 1
+            self.next = Token(token_type, token_value)
+        elif self.source[self.position] == "&" and self.source[self.position + 1] == "&":
+            token_type = "AND"
+            token_value = "&&"
+            self.position += 1
+            self.next = Token(token_type, token_value)
+        elif self.source[self.position] == "!":
+            token_type = "NOT"
+            token_value = "!"
+            self.position += 1
+            self.next = Token(token_type, token_value)
+        elif self.source[self.position] == ">":
+            token_type = "GREATER"
+            token_value = ">"
+            self.position += 1
+            self.next = Token(token_type, token_value)
+        elif self.source[self.position] == "<":
+            token_type = "LESS"
+            token_value = "<"
+            self.position += 1
+            self.next = Token(token_type, token_value)
+        elif self.source[self.position] == "{":
+            token_type = "LEFTBRACE"
+            token_value = "{"
+            self.position += 1
+            self.next = Token(token_type, token_value)
+        elif self.source[self.position] == "}":
+            token_type = "RIGHTBRACE"
+            token_value = "}"
+            self.position += 1
+            self.next = Token(token_type, token_value)
+        elif self.source[self.position] == ";":
+            token_type = "SEMICOLON"
+            token_value = ";"
+            self.position += 1
             self.next = Token(token_type, token_value)
         elif self.source[self.position] == " ":
             self.position += 1
             self.select_next()
         else:
             raise Exception(
-                f"Invalid Token Error: Token {self.source[self.position]} is not a valid token. Located at position {self.position}.")
+                f"Invalid Token Error: Token {repr(self.source[self.position])} is not a valid token. Located at position {self.position}.")

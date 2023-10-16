@@ -1,6 +1,7 @@
 TOKENS = {
             "+": "PLUS", 
-            "-": "MINUS", 
+            "-": "MINUS",
+            ".": "CONCATENATION",
             "*": "MULT", 
             "/": "DIV", 
             "(": "LEFTPARENTESIS", 
@@ -59,6 +60,16 @@ class Tokenizer:
                 token_type = TOKENS[token_value]
             except KeyError:
                 token_type = "IDENTIFIER"
+        elif self.source[self.position] == '"' or self.source[self.position] == "'":
+            quotation_mark = self.source[self.position]
+            token_value = quotation_mark
+            self.position += 1
+            while self.position < len(self.source) and self.source[self.position] != quotation_mark:
+                token_value += str(self.source[self.position])
+                self.position += 1
+            token_value += quotation_mark
+            self.position += 1
+            token_type = "STRING"
         elif self.source[self.position] == " ":
             self.position += 1
             self.select_next()

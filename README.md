@@ -11,17 +11,18 @@
 ```
 PROGRAM = { STATEMENT } ;
 BLOCK = "{", "\n", { STATEMENT }, "}" ;
-STATEMENT = ( λ | ASSIGN | PRINT | IF | FOR ), "\n" ;
+STATEMENT = ( λ | ASSIGN | PRINT | IF | FOR | VAR), "\n" ;
 ASSIGN = IDENTIFIER, "=", BOOLEAN EXPRESSION ;
 PRINT = "Println", "(", BOOLEAN EXPRESSION, ")" ;
 IF = "if", BOOLEAN EXPRESSION, BLOCK, { "else", BLOCK } ;
 FOR = "for", ASSIGN, ";", BOOLEAN EXPRESSION, ";", ASSIGN, BLOCK ;
+VAR = "var", IDENTIFIER, ( "int" | "string" ), ( λ | "=", BOOLEAN EXPRESSION ) ;
 BOOLEAN EXPRESSION = BOOLEAN TERM, { "||" BOOLEAN TERM } ;
 BOOLEAN TERM = RELATIONAL EXPRESSION, { "&&", RELATIONAL EXPRESSION } ;
 RELATIONAL EXPRESSION = EXPRESSION, { ("==" | ">" | "<"), EXPRESSION } ;
-EXPRESSION = TERM, { ("+" | "-"), TERM } ;
+EXPRESSION = TERM, { ("+" | "-" | "." ), TERM } ;
 TERM = FACTOR, { ("*" | "/"), FACTOR } ;
-FACTOR = NUMBER | IDENTIFIER | (("+" | "-" | "!"), FACTOR) | "(", BOOLEAN EXPRESSION, ")" | SCAN ;
+FACTOR = NUMBER | STRING | IDENTIFIER | (("+" | "-" | "!"), FACTOR) | "(", BOOLEAN EXPRESSION, ")" | SCAN ;
 SCAN = "Scanln", "(", ")" ;
 IDENTIFIER = LETTER, { LETTER | DIGIT | "_" } ;
 NUMBER = DIGIT, { DIGIT } ;

@@ -11,8 +11,11 @@ class SymbolTable:
         except KeyError:
             raise Exception(f"Identifier Error: Identifier '{identifier}' not declared.")
     
-    def set(self, identifier: str, value: int):
+    def set(self, identifier: str, value: tuple):
         self.table[identifier] = value
+
+    def create(self, identifier: str):
+        self.table[identifier] = None
 
 class Node(ABC):
     def __init__(self, value: str, children: list[Node]):
@@ -28,6 +31,8 @@ class BinOp(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table: SymbolTable):
+        child_0_value, child_0_type = self.children[0].evaluate(symbol_table)
+        child_1_value, child_1_type = self.children[1].evaluate(symbol_table)
         if self.value == "+":
             return self.children[0].evaluate(symbol_table) + self.children[1].evaluate(symbol_table)
         elif self.value == "-":
@@ -46,6 +51,8 @@ class BinOp(Node):
             return self.children[0].evaluate(symbol_table) > self.children[1].evaluate(symbol_table)
         elif self.value == "<":
             return self.children[0].evaluate(symbol_table) < self.children[1].evaluate(symbol_table)
+        elif self.value == ".":
+            return str(self.children[0].evaluate(symbol_table)) + str(self.children[1].evaluate(symbol_table))
 
 class UnOp(Node):
     def __init__(self, value: str, children: list[Node]):
@@ -129,6 +136,16 @@ class Program(Node):
     def evaluate(self, symbol_table: SymbolTable):
         for child in self.children:
             child.evaluate(symbol_table)
+
+class VarDec(Node):
+    def __init__(self, value: str, children: list[Node]):
+        super().__init__(value, children)
+    
+    def evaluate(self, symbol_table: SymbolTable):
+        if len(self.children) > 1:
+            symbol_table.set(self.children[0].evaluate(symbol_table), self.children[1].evaluate(symbol_table))
+        else:
+            symbol_table.create(self.children[0].evaluate(symbol_table))
 
 class NoOp(Node):
     def __init__(self, value: str, children: list[Node]):

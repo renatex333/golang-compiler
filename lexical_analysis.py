@@ -62,7 +62,7 @@ class Tokenizer:
                 token_type = TOKENS[token_value]
             except KeyError:
                 token_type = "IDENTIFIER"
-        elif self.source[self.position] == '"' or self.source[self.position] == "'":
+        elif self.source[self.position] == '"':
             quotation_mark = self.source[self.position]
             self.position += 1
             while self.position < len(self.source) and self.source[self.position] != quotation_mark:

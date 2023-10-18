@@ -64,10 +64,8 @@ class BinOp(Node):
                 # return (int(child_0_value < child_1_value), "BOOL")
             else:
                 raise Exception(f"Invalid Operator Error: Operator {repr(self.value)} is not a valid operator between types {child_0_type} and {child_1_type}.")
-        elif child_0_type == "STRING" or child_1_type == "STRING":
-            if self.value == ".":
-                return (str(child_0_value) + str(child_1_value), "STRING")
-            elif self.value == "==":
+        elif child_0_type == "STRING" and child_1_type == "STRING":
+            if self.value == "==":
                 return (int(child_0_value == child_1_value), "INT")
                 # return (int(child_0_value == child_1_value), "BOOL")
             elif self.value == ">":
@@ -78,6 +76,12 @@ class BinOp(Node):
                 # return (int(child_0_value < child_1_value), "BOOL")
             else:
                 raise Exception(f"Invalid Operator Error: Operator {repr(self.value)} is not a valid operator between types {child_0_type} and {child_1_type}.")
+        elif child_0_type == "STRING" or child_1_type == "STRING":
+            if self.value == ".":
+                return (str(child_0_value) + str(child_1_value), "STRING")
+            else:
+                raise Exception(f"Invalid Operator Error: Operator {repr(self.value)} is not a valid operator between types {child_0_type} and {child_1_type}.")
+        
 
 class UnOp(Node):
     def __init__(self, value: str, children: list[Node]):

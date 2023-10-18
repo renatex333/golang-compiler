@@ -21,7 +21,10 @@ TOKENS = {
             "Scanln": "SCAN",
             "if": "IF",
             "else": "ELSE",
-            "for": "FOR"
+            "for": "FOR",
+            "var": "VAR",
+            "int": "INT",
+            "string": "STRING"
           }
 
 class Token:
@@ -37,10 +40,9 @@ class Tokenizer:
         self.next = next
 
     def select_next(self):
-        token_type = None
-        token_value = None
+        token_type = ""
+        token_value = ""
         if self.position == len(self.source):
-            token_value = ""
             token_type = "EOF"
         elif self.source[self.position].isnumeric():
             number = str(self.source[self.position])
@@ -62,12 +64,10 @@ class Tokenizer:
                 token_type = "IDENTIFIER"
         elif self.source[self.position] == '"' or self.source[self.position] == "'":
             quotation_mark = self.source[self.position]
-            token_value = quotation_mark
             self.position += 1
             while self.position < len(self.source) and self.source[self.position] != quotation_mark:
                 token_value += str(self.source[self.position])
                 self.position += 1
-            token_value += quotation_mark
             self.position += 1
             token_type = "STRING"
         elif self.source[self.position] == " ":

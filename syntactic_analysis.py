@@ -14,8 +14,8 @@ class SymbolTable:
     def set(self, identifier: str, value: tuple):
         self.table[identifier] = value
 
-    def create(self, identifier: str):
-        self.table[identifier] = None
+    def create(self, identifier: str, var_type: str):
+        self.table[identifier] = (None, var_type)
 
 class Node(ABC):
     def __init__(self, value: str, children: list[Node]):
@@ -33,45 +33,66 @@ class BinOp(Node):
     def evaluate(self, symbol_table: SymbolTable):
         child_0_value, child_0_type = self.children[0].evaluate(symbol_table)
         child_1_value, child_1_type = self.children[1].evaluate(symbol_table)
-        if self.value == "+":
-            return self.children[0].evaluate(symbol_table) + self.children[1].evaluate(symbol_table)
-        elif self.value == "-":
-            return self.children[0].evaluate(symbol_table) - self.children[1].evaluate(symbol_table)
-        elif self.value == "*":
-            return self.children[0].evaluate(symbol_table) * self.children[1].evaluate(symbol_table)
-        elif self.value == "/":
-            return self.children[0].evaluate(symbol_table) // self.children[1].evaluate(symbol_table)
-        elif self.value == "||":
-            return self.children[0].evaluate(symbol_table) or self.children[1].evaluate(symbol_table)
-        elif self.value == "&&":
-            return self.children[0].evaluate(symbol_table) and self.children[1].evaluate(symbol_table)
-        elif self.value == "==":
-            return self.children[0].evaluate(symbol_table) == self.children[1].evaluate(symbol_table)
-        elif self.value == ">":
-            return self.children[0].evaluate(symbol_table) > self.children[1].evaluate(symbol_table)
-        elif self.value == "<":
-            return self.children[0].evaluate(symbol_table) < self.children[1].evaluate(symbol_table)
-        elif self.value == ".":
-            return str(self.children[0].evaluate(symbol_table)) + str(self.children[1].evaluate(symbol_table))
+        if (child_0_type == "INT" or child_0_type == "BOOL") and (child_1_type == "INT" or child_1_type == "BOOL"):
+            if self.value == "+":
+                return (child_0_value + child_1_value, "INT")
+            elif self.value == "-":
+                return (child_0_value - child_1_value, "INT")
+            elif self.value == "*":
+                return (child_0_value * child_1_value, "INT")
+            elif self.value == "/":
+                return (child_0_value // child_1_value, "INT")
+            elif self.value == "||":
+                return (int(child_0_value or child_1_value), "BOOL")
+            elif self.value == "&&":
+                return (int(child_0_value and child_1_value), "BOOL")
+            elif self.value == "==":
+                return (int(child_0_value == child_1_value), "BOOL")
+            elif self.value == ">":
+                return (int(child_0_value > child_1_value), "BOOL")
+            elif self.value == "<":
+                return (int(child_0_value < child_1_value), "BOOL")
+            else:
+                raise Exception(f"Invalid Operator Error: Operator {repr(self.value)} is not a valid operator between types {child_0_type} and {child_1_type}.")
+        elif child_0_type == "STRING" or child_1_type == "STRING":
+            if self.value == ".":
+                return (str(child_0_value) + str(child_1_value), "STRING")
+            elif self.value == "==":
+                return (int(child_0_value == child_1_value), "BOOL")
+            else:
+                raise Exception(f"Invalid Operator Error: Operator {repr(self.value)} is not a valid operator between types {child_0_type} and {child_1_type}.")
 
 class UnOp(Node):
     def __init__(self, value: str, children: list[Node]):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table: SymbolTable):
-        if self.value == "+":
-            return self.children[0].evaluate(symbol_table)
-        elif self.value == "-":
-            return -self.children[0].evaluate(symbol_table)
-        elif self.value == "!":
-            return not self.children[0].evaluate(symbol_table)
+        child_0_value, child_0_type = self.children[0].evaluate(symbol_table)
+        if child_0_type == "INT" or child_0_type == "BOOL":
+            if self.value == "+":
+                return (child_0_value, "INT")
+            elif self.value == "-":
+                return (-child_0_value, "INT")
+            elif self.value == "!":
+                return (int(not child_0_value), "BOOL")
+            else:
+                raise Exception(f"Invalid Operator Error: Operator {repr(self.value)} is not a valid unary operator fot type {child_0_type}.")
+        else:
+            raise Exception(f"Invalid Operator Error: Operator {repr(self.value)} is not a valid unary operator fot type {child_0_type}.")
 
 class IntVal(Node):
     def __init__(self, value: str, children: list[Node]):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table: SymbolTable):
-        return int(self.value)
+        return (int(self.value), "INT")
+    
+class StringVal(Node):
+    def __init__(self, value: str, children: list[Node]):
+        super().__init__(value, children)
+
+    def evaluate(self, symbol_table: SymbolTable):
+        return (str(self.value), "STRING")
     
 class Identifier(Node):
     def __init__(self, value: str, children: list[Node]):
@@ -85,28 +106,35 @@ class Assignment(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table: SymbolTable):
-        symbol_table.set(self.children[0].value, self.children[1].evaluate(symbol_table))
+        child_0_value, child_0_type = self.children[0].evaluate(symbol_table)
+        child_1_value, child_1_type = self.children[1].evaluate(symbol_table)
+        if child_0_type != child_1_type:
+            raise Exception(f"Invalid Type Error: Type {child_1_type} is not a valid type for a variable of type {child_0_type}.")
+        symbol_table.set(self.children[0].value, (child_1_value, child_1_type))
 
 class Print(Node):
     def __init__(self, value: str, children: list[Node]):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table: SymbolTable):
-        print(self.children[0].evaluate(symbol_table))
+        print(self.children[0].evaluate(symbol_table)[0])
 
 class Scan(Node):
     def __init__(self, value: str, children: list[Node]):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table: SymbolTable):
-        return int(input())
+        return (int(input()), "INT")
 
 class If(Node):
     def __init__(self, value: str, children: list[Node]):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table: SymbolTable):
-        if self.children[0].evaluate(symbol_table):
+        child_0_value, child_0_type = self.children[0].evaluate(symbol_table)
+        if child_0_type != "BOOL":
+            raise Exception(f"Invalid Type Error: Type {child_0_type} is not a valid type for an if statement.")
+        if child_0_value:
             self.children[1].evaluate(symbol_table)
         elif len(self.children) > 2:
             self.children[2].evaluate(symbol_table)
@@ -117,7 +145,7 @@ class For(Node):
 
     def evaluate(self, symbol_table: SymbolTable):
         self.children[0].evaluate(symbol_table)
-        while self.children[1].evaluate(symbol_table):
+        while self.children[1].evaluate(symbol_table)[0]:
             self.children[3].evaluate(symbol_table)
             self.children[2].evaluate(symbol_table)
 
@@ -142,10 +170,12 @@ class VarDec(Node):
         super().__init__(value, children)
     
     def evaluate(self, symbol_table: SymbolTable):
+        symbol_table.create(self.children[0].value, self.value)
         if len(self.children) > 1:
-            symbol_table.set(self.children[0].evaluate(symbol_table), self.children[1].evaluate(symbol_table))
-        else:
-            symbol_table.create(self.children[0].evaluate(symbol_table))
+            child_1_value, child_1_type = self.children[1].evaluate(symbol_table)
+            if child_1_type != self.value:
+                raise Exception(f"Invalid Type Error: Type {child_1_type} is not a valid type for a variable of type {self.value}.")
+            symbol_table.set(self.children[0].value, (child_1_value, child_1_type))            
 
 class NoOp(Node):
     def __init__(self, value: str, children: list[Node]):

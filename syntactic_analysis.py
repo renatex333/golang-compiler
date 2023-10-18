@@ -17,6 +17,9 @@ class SymbolTable:
     def create(self, identifier: str, var_type: str):
         self.table[identifier] = (None, var_type)
 
+    def check(self, identifier: str):
+        return identifier in self.table.keys()
+
 class Node(ABC):
     def __init__(self, value: str, children: list[Node]):
         self.value = value
@@ -38,27 +41,32 @@ class BinOp(Node):
                 return (child_0_value + child_1_value, "INT")
             elif self.value == "-":
                 return (child_0_value - child_1_value, "INT")
+            elif self.value == ".":
+                return (str(child_0_value) + str(child_1_value), "STRING")
             elif self.value == "*":
                 return (child_0_value * child_1_value, "INT")
             elif self.value == "/":
                 return (child_0_value // child_1_value, "INT")
             elif self.value == "||":
-                return (int(child_0_value or child_1_value), "BOOL")
+                return (int(child_0_value or child_1_value), "INT")
+                # return (int(child_0_value or child_1_value), "BOOL")
             elif self.value == "&&":
-                return (int(child_0_value and child_1_value), "BOOL")
+                return (int(child_0_value and child_1_value), "INT")
+                # return (int(child_0_value and child_1_value), "BOOL")
             elif self.value == "==":
-                return (int(child_0_value == child_1_value), "BOOL")
+                return (int(child_0_value == child_1_value), "INT")
+                # return (int(child_0_value == child_1_value), "BOOL")
             elif self.value == ">":
-                return (int(child_0_value > child_1_value), "BOOL")
+                return (int(child_0_value > child_1_value), "INT")
+                # return (int(child_0_value > child_1_value), "BOOL")
             elif self.value == "<":
-                return (int(child_0_value < child_1_value), "BOOL")
+                return (int(child_0_value < child_1_value), "INT")
+                # return (int(child_0_value < child_1_value), "BOOL")
             else:
                 raise Exception(f"Invalid Operator Error: Operator {repr(self.value)} is not a valid operator between types {child_0_type} and {child_1_type}.")
         elif child_0_type == "STRING" or child_1_type == "STRING":
             if self.value == ".":
                 return (str(child_0_value) + str(child_1_value), "STRING")
-            elif self.value == "==":
-                return (int(child_0_value == child_1_value), "BOOL")
             else:
                 raise Exception(f"Invalid Operator Error: Operator {repr(self.value)} is not a valid operator between types {child_0_type} and {child_1_type}.")
 
@@ -74,7 +82,8 @@ class UnOp(Node):
             elif self.value == "-":
                 return (-child_0_value, "INT")
             elif self.value == "!":
-                return (int(not child_0_value), "BOOL")
+                return (int(not child_0_value), "INT")
+                # return (int(not child_0_value), "BOOL")
             else:
                 raise Exception(f"Invalid Operator Error: Operator {repr(self.value)} is not a valid unary operator fot type {child_0_type}.")
         else:
@@ -132,7 +141,8 @@ class If(Node):
 
     def evaluate(self, symbol_table: SymbolTable):
         child_0_value, child_0_type = self.children[0].evaluate(symbol_table)
-        if child_0_type != "BOOL":
+        if child_0_type != "INT":
+        # if child_0_type != "BOOL":
             raise Exception(f"Invalid Type Error: Type {child_0_type} is not a valid type for an if statement.")
         if child_0_value:
             self.children[1].evaluate(symbol_table)
@@ -170,6 +180,8 @@ class VarDec(Node):
         super().__init__(value, children)
     
     def evaluate(self, symbol_table: SymbolTable):
+        if symbol_table.check(self.children[0].value):
+            raise Exception(f"Identifier Error: Identifier '{self.children[0].value}' already declared.")
         symbol_table.create(self.children[0].value, self.value)
         if len(self.children) > 1:
             child_1_value, child_1_type = self.children[1].evaluate(symbol_table)

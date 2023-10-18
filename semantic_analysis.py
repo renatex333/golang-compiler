@@ -1,6 +1,6 @@
 from pre_processing import PrePro
 from lexical_analysis import Tokenizer
-from syntactic_analysis import BinOp, UnOp, IntVal, Identifier, Assignment, Print, Scan, If, For, Block, Program, NoOp
+from syntactic_analysis import BinOp, UnOp, IntVal, StringVal, Identifier, Assignment, Print, Scan, If, For, Block, Program, VarDec, NoOp
 
 class Parser:
     tokenizer = None
@@ -107,6 +107,22 @@ class Parser:
             block = Parser.parse_block()
             children.append(block)
             root = For("For", children)
+        elif Parser.tokenizer.next.type == "VAR":
+            Parser.tokenizer.select_next()
+            children = []
+            if Parser.tokenizer.next.type != "IDENTIFIER":
+                raise Exception(f"Invalid Input Error: Expected identifier after 'var'. Got '{Parser.tokenizer.next.value}' instead.")
+            identifier = Identifier(Parser.tokenizer.next.value, [])
+            children.append(identifier)
+            Parser.tokenizer.select_next()
+            if Parser.tokenizer.next.type != "INT" and Parser.tokenizer.next.type != "STRING":
+                raise Exception(f"Invalid Input Error: Expected 'int' or 'string' after identifier. Got '{Parser.tokenizer.next.value}' instead.")
+            var_type = Parser.tokenizer.next.type
+            Parser.tokenizer.select_next()
+            if Parser.tokenizer.next.type == "ASSIGNMENT":
+                Parser.tokenizer.select_next()
+                children.append(Parser.parse_boolean_expression())
+            root = VarDec(var_type, children)
         if Parser.tokenizer.next.type != "NEWLINE":
             raise Exception(f"Invalid Statement: Expected newline ('\\n') after statement. Got '{Parser.tokenizer.next.value}' instead.")
         Parser.tokenizer.select_next()
@@ -145,13 +161,16 @@ class Parser:
     @staticmethod
     def parse_expression():
         root = Parser.parse_term()
-        while (Parser.tokenizer.next.type == "PLUS") or (Parser.tokenizer.next.type == "MINUS"):
+        while (Parser.tokenizer.next.type == "PLUS") or (Parser.tokenizer.next.type == "MINUS") or (Parser.tokenizer.next.type == "CONCATENATION"):
             if Parser.tokenizer.next.type == "PLUS":
                 Parser.tokenizer.select_next()
                 root = BinOp("+", [root, Parser.parse_term()])
             elif Parser.tokenizer.next.type == "MINUS":
                 Parser.tokenizer.select_next()
                 root = BinOp("-", [root, Parser.parse_term()])
+            elif Parser.tokenizer.next.type == "CONCATENATION":
+                Parser.tokenizer.select_next()
+                root = BinOp(".", [root, Parser.parse_term()])
         return root
 
     @staticmethod
@@ -171,6 +190,9 @@ class Parser:
         root = None
         if Parser.tokenizer.next.type == "INT":
             root = IntVal(Parser.tokenizer.next.value, [])
+            Parser.tokenizer.select_next()
+        elif Parser.tokenizer.next.type == "STRING":
+            root = StringVal(Parser.tokenizer.next.value, [])
             Parser.tokenizer.select_next()
         elif Parser.tokenizer.next.type == "IDENTIFIER":
             root = Identifier(Parser.tokenizer.next.value, [])

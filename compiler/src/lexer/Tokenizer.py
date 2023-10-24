@@ -1,3 +1,5 @@
+from .Token import Token
+
 TOKENS = {
             "+": "PLUS", 
             "-": "MINUS",
@@ -26,12 +28,6 @@ TOKENS = {
             "int": "INT",
             "string": "STRING"
           }
-
-class Token:
-    def __init__(self, type: str, value: int):
-        self.type = type
-        self.value = value
-
 
 class Tokenizer:
     def __init__(self, source: str, position: int, next: Token):

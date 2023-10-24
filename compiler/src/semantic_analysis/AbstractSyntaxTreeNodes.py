@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from SymbolTable import SymbolTable
+from .SymbolTable import SymbolTable
 
 class Node(ABC):
     def __init__(self, value: str, children: list[Node]):

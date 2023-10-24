@@ -8,7 +8,7 @@ Welcome to my GoLang compiler repository! This project was developed under the g
 
 ## Syntactic Diagram
 
-![syntactic diagram](./src/syntactic-diagram.png)
+![syntactic diagram](./img/syntactic-diagram.png)
 
 ## EBNF
 

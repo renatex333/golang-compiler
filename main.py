@@ -1,7 +1,7 @@
 import sys
 
-from Parser import Parser
-from AbstractSyntaxTreeNodes import SymbolTable
+from compiler.src.parser.Parser import Parser
+from compiler.src.semantic_analysis.SymbolTable import SymbolTable
 
 def main(argv):
     root = Parser.run(argv[1])

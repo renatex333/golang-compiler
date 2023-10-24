@@ -12,7 +12,6 @@ class SymbolTable:
         self.table[identifier] = value
 
     def create(self, identifier: str, var_type: str):
+        if identifier in self.table.keys():
+            raise Exception(f"Identifier Error: Identifier '{self.children[0].value}' already declared.")
         self.table[identifier] = (None, var_type)
-
-    def check(self, identifier: str):
-        return identifier in self.table.keys()

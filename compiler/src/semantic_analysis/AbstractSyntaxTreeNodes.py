@@ -177,8 +177,6 @@ class VarDec(Node):
         super().__init__(value, children)
     
     def evaluate(self, symbol_table: SymbolTable):
-        if symbol_table.check(self.children[0].value):
-            raise Exception(f"Identifier Error: Identifier '{self.children[0].value}' already declared.")
         symbol_table.create(self.children[0].value, self.value)
         if len(self.children) > 1:
             child_1_value, child_1_type = self.children[1].evaluate(symbol_table)

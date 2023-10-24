@@ -1,10 +1,14 @@
-# Projeto-Logica
+# GoLang Compiler by Renato Laffranchi Falcão
 
-![git status](http://3.129.230.99/svg/renatex333/Projeto-Logica/)
+Welcome to my GoLang compiler repository! This project was developed under the guidance of Professor Raul Ikeda during the "Lógica da Computação" course at Insper. It encapsulates intricate principles of the theory of computation and compiler design, presenting a comprehensive journey into the world of GoLang compiler creation.
 
-## Diagrama sintático
+## Sprint Tracker
 
-![diagrama sintatico](./diagrama-sintatico.png)
+![sprint tracker](http://3.129.230.99/svg/renatex333/Projeto-Logica/)
+
+## Syntactic Diagram
+
+![syntactic diagram](./src/syntactic-diagram.png)
 
 ## EBNF
 

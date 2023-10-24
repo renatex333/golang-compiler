@@ -1,7 +1,7 @@
 import sys
 
-from semantic_analysis import Parser
-from syntactic_analysis import SymbolTable
+from Parser import Parser
+from AbstractSyntaxTreeNodes import SymbolTable
 
 def main(argv):
     root = Parser.run(argv[1])
@@ -10,3 +10,4 @@ def main(argv):
 
 if __name__ == "__main__":
     main(sys.argv)
+

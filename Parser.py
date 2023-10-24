@@ -1,6 +1,6 @@
-from pre_processing import PrePro
-from lexical_analysis import Tokenizer
-from syntactic_analysis import BinOp, UnOp, IntVal, StringVal, Identifier, Assignment, Print, Scan, If, For, Block, Program, VarDec, NoOp
+from PreProcessing import PrePro
+from Tokenizer import Tokenizer
+from AbstractSyntaxTreeNodes import BinOp, UnOp, IntVal, StringVal, Identifier, Assignment, Print, Scan, If, For, Block, Program, VarDec, NoOp
 
 class Parser:
     tokenizer = None

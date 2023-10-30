@@ -18,7 +18,7 @@ class BinOp(Node):
     def evaluate(self, symbol_table: SymbolTable):
         child_0_value, child_0_type = self.children[0].evaluate(symbol_table)
         child_1_value, child_1_type = self.children[1].evaluate(symbol_table)
-        if (child_0_type == "INT" or child_0_type == "BOOL") and (child_1_type == "INT" or child_1_type == "BOOL"):
+        if child_0_type == "INT" and child_1_type == "INT":
             if self.value == "+":
                 return (child_0_value + child_1_value, "INT")
             elif self.value == "-":
@@ -31,19 +31,14 @@ class BinOp(Node):
                 return (child_0_value // child_1_value, "INT")
             elif self.value == "||":
                 return (int(child_0_value or child_1_value), "INT")
-                # return (int(child_0_value or child_1_value), "BOOL")
             elif self.value == "&&":
                 return (int(child_0_value and child_1_value), "INT")
-                # return (int(child_0_value and child_1_value), "BOOL")
             elif self.value == "==":
                 return (int(child_0_value == child_1_value), "INT")
-                # return (int(child_0_value == child_1_value), "BOOL")
             elif self.value == ">":
                 return (int(child_0_value > child_1_value), "INT")
-                # return (int(child_0_value > child_1_value), "BOOL")
             elif self.value == "<":
                 return (int(child_0_value < child_1_value), "INT")
-                # return (int(child_0_value < child_1_value), "BOOL")
             else:
                 raise Exception(f"Invalid Operator Error: Operator {repr(self.value)} is not a valid operator between types {child_0_type} and {child_1_type}.")
         elif child_0_type == "STRING" and child_1_type == "STRING":
@@ -51,13 +46,10 @@ class BinOp(Node):
                 return (str(child_0_value) + str(child_1_value), "STRING")
             elif self.value == "==":
                 return (int(child_0_value == child_1_value), "INT")
-                # return (int(child_0_value == child_1_value), "BOOL")
             elif self.value == ">":
                 return (int(child_0_value > child_1_value), "INT")
-                # return (int(child_0_value > child_1_value), "BOOL")
             elif self.value == "<":
                 return (int(child_0_value < child_1_value), "INT")
-                # return (int(child_0_value < child_1_value), "BOOL")
             else:
                 raise Exception(f"Invalid Operator Error: Operator {repr(self.value)} is not a valid operator between types {child_0_type} and {child_1_type}.")
         elif child_0_type == "STRING" or child_1_type == "STRING":
@@ -80,7 +72,6 @@ class UnOp(Node):
                 return (-child_0_value, "INT")
             elif self.value == "!":
                 return (int(not child_0_value), "INT")
-                # return (int(not child_0_value), "BOOL")
             else:
                 raise Exception(f"Invalid Operator Error: Operator {repr(self.value)} is not a valid unary operator fot type {child_0_type}.")
         else:

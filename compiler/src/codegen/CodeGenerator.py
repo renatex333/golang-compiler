@@ -60,7 +60,7 @@ main:
     
     def write_line(self, line: str):
         with open(self.filename, "a") as file:
-            file.write(line + "\n")
+            file.write("\t" + line + "\n")
 
     def finish(self):
         with open(self.filename, "a") as file:

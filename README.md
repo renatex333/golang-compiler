@@ -34,3 +34,8 @@ STRING = ( `"` | `'` ), { λ | LETTER | DIGIT }, ( `"` | `'` ) ;
 LETTER = ( a | ... | z | A | ... | Z ) ;
 DIGIT = ( 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 0 ) ;
 ```
+
+## References
+
+IME-USP. (1999). [The Netwide Assembler: NASM](https://www.ime.usp.br/~reverbel/mac211-99/asm/nasm_doc/nasmdoca.html).
+FLINT Group, Yale. (2006). [x86 Assembly Guide](https://flint.cs.yale.edu/cs421/papers/x86-asm/asm.html).

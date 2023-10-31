@@ -14,4 +14,4 @@ class SymbolTable:
     def create(self, identifier: str, var_type: str):
         if identifier in self.table.keys():
             raise Exception(f"Identifier Error: Identifier '{self.children[0].value}' already declared.")
-        self.table[identifier] = (None, var_type)
+        self.table[identifier] = (None, var_type, (len(self.table) + 1) * 4)

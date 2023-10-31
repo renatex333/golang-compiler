@@ -10,10 +10,10 @@ def main(argv):
     filename = "program.asm"
     if len(argv) > 2:
         filename = argv[2]
-    code_gen = CodeGen(filename)
-    code_gen.start()
-    # root.evaluate(symbol_table, code_gen)
-    code_gen.finish()
+    code_generator = CodeGen(filename)
+    code_generator.start()
+    root.evaluate(symbol_table, code_generator)
+    code_generator.finish()
 
 if __name__ == "__main__":
     main(sys.argv)

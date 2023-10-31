@@ -53,15 +53,15 @@ class BinOp(Node):
                 return (int(child_0_value and child_1_value), "INT")
             elif self.value == "==":
                 code_generator.write_line(f"CMP EAX, EBX")
-                code_generator.write_line(f"JMP binop_je")
+                code_generator.write_line(f"CALL binop_je")
                 return (int(child_0_value == child_1_value), "INT")
             elif self.value == ">":
                 code_generator.write_line(f"CMP EAX, EBX")
-                code_generator.write_line(f"JMP binop_jg")
+                code_generator.write_line(f"CALL binop_jg")
                 return (int(child_0_value > child_1_value), "INT")
             elif self.value == "<":
                 code_generator.write_line(f"CMP EAX, EBX")
-                code_generator.write_line(f"JMP binop_jl")
+                code_generator.write_line(f"CALL binop_jl")
                 return (int(child_0_value < child_1_value), "INT")
             else:
                 raise Exception(f"Invalid Operator Error: Operator {repr(self.value)} is not a valid operator between types {child_0_type} and {child_1_type}.")
@@ -101,7 +101,8 @@ class UnOp(Node):
                 code_generator.write_line(f"NEG EAX")
                 return (-child_0_value, "INT")
             elif self.value == "!":
-                code_generator.write_line(f"NOT EAX")
+                code_generator.write_line(f"TEST EAX, EAX")
+                code_generator.write_line(f"SETZ AL")
                 return (int(not child_0_value), "INT")
             else:
                 raise Exception(f"Invalid Operator Error: Operator {repr(self.value)} is not a valid unary operator fot type {child_0_type}.")
@@ -150,11 +151,11 @@ class Print(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table: SymbolTable, code_generator: CodeGen):
+        child_0_value, child_0_type = self.children[0].evaluate(symbol_table, code_generator)
         code_generator.write_line(f"PUSH EAX")
         code_generator.write_line(f"PUSH formatout")
         code_generator.write_line(f"CALL printf")
         code_generator.write_line(f"ADD ESP, 8")
-        print(self.children[0].evaluate(symbol_table, code_generator)[0])
 
 class Scan(Node):
     def __init__(self, value: str, children: list[Node]):
@@ -190,12 +191,14 @@ class For(Node):
     def evaluate(self, symbol_table: SymbolTable, code_generator: CodeGen):
         self.children[0].evaluate(symbol_table, code_generator)
         code_generator.write_line(f"LOOP_{self.index}:")
+        code_generator.indent_up()
         child_1_value, child_1_type = self.children[1].evaluate(symbol_table, code_generator)
         code_generator.write_line(f"CMP EAX, False")
         code_generator.write_line(f"JE EXIT_{self.index}")
         self.children[3].evaluate(symbol_table, code_generator)
         self.children[2].evaluate(symbol_table, code_generator)
         code_generator.write_line(f"JMP LOOP_{self.index}")
+        code_generator.indent_down()
         code_generator.write_line(f"EXIT_{self.index}:")
 
 class Block(Node):
@@ -227,6 +230,7 @@ class VarDec(Node):
                 raise Exception(f"Invalid Type Error: Type {child_1_type} is not a valid type for a variable of type {self.value}.")
             identifier_value, identifier_type, identifier_stack_location = symbol_table.get(self.children[0].value)
             symbol_table.set(self.children[0].value, (child_1_value, child_1_type, identifier_stack_location))
+            code_generator.write_line(f"MOV [EBP - {identifier_stack_location}], EAX")
 
 class NoOp(Node):
     def __init__(self, value: str, children: list[Node]):

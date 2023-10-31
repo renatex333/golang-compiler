@@ -54,14 +54,22 @@ main:
     MOV EAX, 1
     INT 0x80
 """
+        self.indent = 1
+
     def start(self):
         with open(self.filename, "w") as file:
             file.write(self.asm_header)
     
     def write_line(self, line: str):
         with open(self.filename, "a") as file:
-            file.write("\t" + line + "\n")
+            file.write(self.indent*"\t" + line + "\n")
 
     def finish(self):
         with open(self.filename, "a") as file:
             file.write(self.asm_footer)
+
+    def indent_up(self):
+        self.indent += 1
+    
+    def indent_down(self):
+        self.indent -= 1

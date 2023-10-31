@@ -1,6 +1,6 @@
 class CodeGen():
     def __init__(self, filename: str):
-        self.filename = filename
+        self.filename = filename.replace(".go", ".asm")
         self.asm_header =   """
 ; constantes
 SYS_EXIT equ 1

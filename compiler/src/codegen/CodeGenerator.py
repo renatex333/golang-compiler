@@ -18,6 +18,8 @@ scanint: times 4 db 0 ; 32-bit integer = 4 bytes
 
 segment .bss ; variables
 res RESB 1
+extern fflush
+extern stdout
 
 section .text
 global main ; linux
@@ -50,8 +52,13 @@ main:
 
         self.asm_footer =   """
     ; interruption to exit the program
+    PUSH DWORD [stdout]
+    CALL fflush
+    ADD ESP, 4
+    MOV ESP, EBP
     POP EBP
     MOV EAX, 1
+    XOR EBX, EBX
     INT 0x80
 """
         self.indent = 1

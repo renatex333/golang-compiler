@@ -12,4 +12,5 @@ if (x == 3) {
 for x = 3; x < 5; x = x + 1 {
     y = x - 1
 }
-Println(!x)
+x = Scanln()
+Println(x)

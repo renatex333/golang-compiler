@@ -15,6 +15,8 @@ scanint: times 4 db 0 ; 32-bit integer = 4 bytes
 
 segment .bss ; variables
 res RESB 1
+extern fflush
+extern stdout
 
 section .text
 global main ; linux
@@ -104,15 +106,24 @@ main:
 		MOV [EBP - 4], EAX
 		JMP LOOP_49
 	EXIT_49:
+	PUSH scanint
+	PUSH formatin
+	CALL scanf
+	ADD ESP, 8
+	MOV EAX, DWORD [scanint]
+	MOV [EBP - 4], EAX
 	MOV EAX, [EBP - 4]
-	TEST EAX, EAX
-	SETZ AL
 	PUSH EAX
 	PUSH formatout
 	CALL printf
 	ADD ESP, 8
 
     ; interruption to exit the program
+    PUSH DWORD [stdout]
+    CALL fflush
+    ADD ESP, 4
+    MOV ESP, EBP
     POP EBP
     MOV EAX, 1
+    XOR EBX, EBX
     INT 0x80

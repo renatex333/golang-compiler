@@ -1,36 +1,33 @@
+from .Token import Token
+
 TOKENS = {
-            "+": "PLUS", 
-            "-": "MINUS",
-            ".": "CONCATENATION",
-            "*": "MULT", 
-            "/": "DIV", 
-            "(": "LEFTPARENTESIS", 
-            ")": "RIGHTPARENTESIS", 
-            "\n": "NEWLINE",
-            "=": "ASSIGNMENT",
-            "!": "NOT", 
-            ">": "GREATER", 
-            "<": "LESS", 
-            "==": "EQUALS",
-            "||": "OR",
-            "&&": "AND",
-            "{": "LEFTBRACE", 
-            "}": "RIGHTBRACE", 
-            ";": "SEMICOLON",
-            "Println": "PRINT",
-            "Scanln": "SCAN",
-            "if": "IF",
-            "else": "ELSE",
+    "+": "PLUS",
+    "-": "MINUS",
+    ".": "CONCATENATION",
+    "*": "MULT",
+    "/": "DIV",
+    "(": "LEFTPARENTESIS",
+    ")": "RIGHTPARENTESIS",
+    "\n": "NEWLINE",
+    "=": "ASSIGNMENT",
+    "!": "NOT",
+    ">": "GREATER",
+    "<": "LESS",
+    "==": "EQUALS",
+    "||": "OR",
+    "&&": "AND",
+    "{": "LEFTBRACE",
+    "}": "RIGHTBRACE",
+    ";": "SEMICOLON",
+    "Println": "PRINT",
+    "Scanln": "SCAN",
+    "if": "IF",
+    "else": "ELSE",
             "for": "FOR",
             "var": "VAR",
             "int": "INT",
             "string": "STRING"
-          }
-
-class Token:
-    def __init__(self, type: str, value: int):
-        self.type = type
-        self.value = value
+}
 
 
 class Tokenizer:
@@ -76,8 +73,10 @@ class Tokenizer:
             return
         else:
             try:
-                token_type = TOKENS[self.source[self.position] + self.source[self.position + 1]]
-                token_value = self.source[self.position] + self.source[self.position + 1]
+                token_type = TOKENS[self.source[self.position] +
+                                    self.source[self.position + 1]]
+                token_value = self.source[self.position] + \
+                    self.source[self.position + 1]
                 self.position += 2
             except (KeyError, IndexError):
                 try:
@@ -85,5 +84,6 @@ class Tokenizer:
                     token_value = self.source[self.position]
                     self.position += 1
                 except KeyError:
-                    raise Exception(f"Invalid Token Error: Token {repr(self.source[self.position])} is not a valid token. Located at position {self.position}. ")
-        self.next = Token(token_type, token_value)  
+                    raise Exception(
+                        f"Invalid Token Error: Token {repr(self.source[self.position])} is not a valid token. Located at position {self.position}. ")
+        self.next = Token(token_type, token_value)

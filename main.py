@@ -1,10 +1,10 @@
 import sys
 
-from semantic_analysis import Parser
-from syntactic_analysis import SymbolTable
+from compiler.src.parser.Parser import Parser
+from compiler.src.semantic_analysis.SymbolTable import SymbolTable
 
 def main(argv):
-    root = Parser.run(argv[1])
+    root = Parser.run(filename=argv[1])
     symbol_table = SymbolTable()
     root.evaluate(symbol_table)
 

@@ -8,6 +8,7 @@ TOKENS = {
     "/": "DIV",
     "(": "LEFTPARENTESIS",
     ")": "RIGHTPARENTESIS",
+    ",": "COMMA",
     "\n": "NEWLINE",
     "=": "ASSIGNMENT",
     "!": "NOT",
@@ -23,10 +24,12 @@ TOKENS = {
     "Scanln": "SCAN",
     "if": "IF",
     "else": "ELSE",
-            "for": "FOR",
-            "var": "VAR",
-            "int": "INT",
-            "string": "STRING"
+    "for": "FOR",
+    "var": "VAR",
+    "int": "INT",
+    "string": "STRING",
+    "func": "FUNCTION",
+    "return": "RETURN"
 }
 
 

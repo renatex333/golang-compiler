@@ -145,7 +145,6 @@ class If(Node):
     def evaluate(self, symbol_table: SymbolTable):
         child_0_value, child_0_type = self.children[0].evaluate(symbol_table)
         if child_0_type != "INT":
-            # if child_0_type != "BOOL":
             raise Exception(
                 f"Invalid Type Error: Type {child_0_type} is not a valid type for an if statement.")
         if child_0_value:
@@ -157,12 +156,16 @@ class If(Node):
 class For(Node):
     def __init__(self, value: str, children: list[Node]):
         super().__init__(value, children)
+        self.initialization = self.children[0]
+        self.condition = self.children[1]
+        self.increment = self.children[2]
+        self.body = self.children[3]
 
     def evaluate(self, symbol_table: SymbolTable):
-        self.children[0].evaluate(symbol_table)
-        while self.children[1].evaluate(symbol_table)[0]:
-            self.children[3].evaluate(symbol_table)
-            self.children[2].evaluate(symbol_table)
+        self.initialization.evaluate(symbol_table)
+        while self.condition.evaluate(symbol_table)[0]:
+            self.body.evaluate(symbol_table)
+            self.increment.evaluate(symbol_table)
 
 
 class Block(Node):
@@ -198,6 +201,24 @@ class VarDec(Node):
             symbol_table.set(
                 self.children[0].value, (child_1_value, child_1_type))
 
+class FuncDec(Node):
+    def __init__(self, value: str, children: list[Node]):
+        super().__init__(value, children)
+        self.func_identifier = self.children[0]
+        self.body = self.children[-1]
+        self.arguments = None
+        if len(self.children) > 2:
+            self.arguments = self.children[1:-1]
+        
+    def evaluate(self, symbol_table: SymbolTable):
+        pass
+
+class FuncCall(Node):
+    def __init__(self, value: str, children: list[Node]):
+        super().__init__(value, children)
+        
+    def evaluate(self, symbol_table: SymbolTable):
+        pass
 
 class NoOp(Node):
     def __init__(self, value: str, children: list[Node]):

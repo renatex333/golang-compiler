@@ -220,6 +220,13 @@ class FuncCall(Node):
     def evaluate(self, symbol_table: SymbolTable):
         pass
 
+class Return(Node):
+    def __init__(self, value: str, children: list[Node]):
+        super().__init__(value, children)
+        
+    def evaluate(self, symbol_table: SymbolTable):
+        pass
+
 class NoOp(Node):
     def __init__(self, value: str, children: list[Node]):
         super().__init__(value, children)

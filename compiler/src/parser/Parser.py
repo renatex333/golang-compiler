@@ -1,6 +1,6 @@
 from compiler.src.preprocess.PreProcessing import PrePro
 from compiler.src.lexer.Tokenizer import Tokenizer
-from compiler.src.semantic_analysis.AbstractSyntaxTreeNodes import BinOp, UnOp, IntVal, StringVal, Identifier, Assignment, Print, Scan, If, For, Block, Program, VarDec, FuncDec, FuncCall, NoOp
+from compiler.src.semantic_analysis.AbstractSyntaxTreeNodes import BinOp, UnOp, IntVal, StringVal, Identifier, Assignment, Print, Scan, If, For, Block, Program, VarDec, FuncDec, FuncCall, Return, NoOp
 
 
 class Parser:
@@ -31,9 +31,14 @@ class Parser:
 
     @staticmethod
     def parse_declaration():
+        root = None
+        if Parser.tokenizer.next.type == "NEWLINE":
+            Parser.tokenizer.select_next()
+            root = NoOp("NoOp", [])
+            return root
         if Parser.tokenizer.next.type != "FUNCTION":
             raise Exception(
-                f"Invalid Input Error: Expected 'function' before function declaration. Got '{Parser.tokenizer.next.value}' instead.")
+                f"Invalid Input Error: Expected 'func' before function declaration. Got '{Parser.tokenizer.next.value}' instead.")
         Parser.tokenizer.select_next()
         if Parser.tokenizer.next.type != "IDENTIFIER":
             raise Exception(
@@ -45,7 +50,7 @@ class Parser:
                 f"Invalid Input Error: Expected '(' after function declaration. Got '{Parser.tokenizer.next.value}' instead.")
         Parser.tokenizer.select_next()
         children = []
-        while Parser.tokenizer.next.type != "RIGHTPARENTESIS" and Parser.tokenizer.next.type == "COMMA":
+        while Parser.tokenizer.next.type != "RIGHTPARENTESIS":
             var_dec_children = []
             if Parser.tokenizer.next.type != "IDENTIFIER":
                 raise Exception(
@@ -63,9 +68,11 @@ class Parser:
             #     var_dec_children.append(Parser.parse_boolean_expression())
             children.append(VarDec(var_type, var_dec_children))
             Parser.tokenizer.select_next()
-        if Parser.tokenizer.next.type != "RIGHTPARENTESIS":
-            raise Exception(
-                f"Invalid Input Error: Expected ')' after function declaration. Got '{Parser.tokenizer.next.value}' instead.")
+            if Parser.tokenizer.next.type != "COMMA" and Parser.tokenizer.next.type != "RIGHTPARENTESIS":
+                raise Exception(
+                    f"Invalid Input Error: Expected ')' or ',' after function declaration. Got '{Parser.tokenizer.next.value}' instead.")
+            if Parser.tokenizer.next.type == "COMMA":
+                Parser.tokenizer.select_next()
         Parser.tokenizer.select_next()
         if Parser.tokenizer.next.type != "INT" and Parser.tokenizer.next.type != "STRING":
             raise Exception(
@@ -76,7 +83,6 @@ class Parser:
         Parser.tokenizer.select_next()
         block = Parser.parse_block()
         children.append(block)
-        Parser.tokenizer.select_next()
         if Parser.tokenizer.next.type != "NEWLINE":
             raise Exception(
                 f"Invalid Input Error: Expected newline ('\\n') after block. Got '{Parser.tokenizer.next.value}' instead.")
@@ -124,12 +130,13 @@ class Parser:
             elif Parser.tokenizer.next.type == "LEFTPARENTESIS":
                 Parser.tokenizer.select_next()
                 children = []
-                while Parser.tokenizer.next.type != "RIGHTPARENTESIS" and Parser.tokenizer.next.type == "COMMA":
-                    Parser.tokenizer.select_next()
+                while Parser.tokenizer.next.type != "RIGHTPARENTESIS":
                     children.append(Parser.parse_boolean_expression())
-                if Parser.tokenizer.next.type != "RIGHTPARENTESIS":
-                    raise Exception(
-                        f"Invalid Input Error: Expected ')' after function call. Got '{Parser.tokenizer.next.value}' instead.")
+                    if Parser.tokenizer.next.type != "COMMA" and Parser.tokenizer.next.type != "RIGHTPARENTESIS":
+                        raise Exception(
+                            f"Invalid Input Error: Expected ')' after function call. Got '{Parser.tokenizer.next.value}' instead.")
+                    if Parser.tokenizer.next.type == "COMMA":
+                        Parser.tokenizer.select_next()
                 Parser.tokenizer.select_next()
                 root = FuncCall(identifier_name, children)         
         elif Parser.tokenizer.next.type == "PRINT":
@@ -213,6 +220,9 @@ class Parser:
                 Parser.tokenizer.select_next()
                 children.append(Parser.parse_boolean_expression())
             root = VarDec(var_type, children)
+        elif Parser.tokenizer.next.type == "RETURN":
+            Parser.tokenizer.select_next()
+            root = Return("Return", [Parser.parse_boolean_expression()])
         if Parser.tokenizer.next.type != "NEWLINE":
             raise Exception(
                 f"Invalid Statement: Expected newline ('\\n') after statement. Got '{Parser.tokenizer.next.value}' instead.")
@@ -286,8 +296,21 @@ class Parser:
             root = StringVal(Parser.tokenizer.next.value, [])
             Parser.tokenizer.select_next()
         elif Parser.tokenizer.next.type == "IDENTIFIER":
-            root = Identifier(Parser.tokenizer.next.value, [])
+            identifier_name = Parser.tokenizer.next.value
+            root = Identifier(identifier_name, [])
             Parser.tokenizer.select_next()
+            if Parser.tokenizer.next.type == "LEFTPARENTESIS":
+                Parser.tokenizer.select_next()
+                children = []
+                while Parser.tokenizer.next.type != "RIGHTPARENTESIS":
+                    children.append(Parser.parse_boolean_expression())
+                    if Parser.tokenizer.next.type != "COMMA" and Parser.tokenizer.next.type != "RIGHTPARENTESIS":
+                        raise Exception(
+                            f"Invalid Input Error: Expected ')' after function call. Got '{Parser.tokenizer.next.value}' instead.")
+                    if Parser.tokenizer.next.type == "COMMA":
+                        Parser.tokenizer.select_next()
+                Parser.tokenizer.select_next()
+                root = FuncCall(identifier_name, children)
         elif Parser.tokenizer.next.type == "PLUS":
             Parser.tokenizer.select_next()
             root = UnOp("+", [Parser.parse_factor()])
@@ -317,5 +340,5 @@ class Parser:
             root = Scan("Scan", [])
         else:
             raise Exception(
-                f"Invalid Input Error: Expected an integer, identifier, '+', '-', '!', '(' or 'Scanln'. Got '{Parser.tokenizer.next.value}' instead.")
+                f"Invalid Input Error: Expected an integer, identifier, function call, '+', '-', '!', '(' or 'Scanln'. Got '{Parser.tokenizer.next.value}' instead.")
         return root

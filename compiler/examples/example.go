@@ -12,8 +12,9 @@ func concat(a string, b string) string {
 }
 
 func main() int {
+
     var x_1 int
-    x_1 = soma(read()-1, 1)
+    x_1 = soma(1,1)
     soma(2, 1)
 
     Println(x_1)

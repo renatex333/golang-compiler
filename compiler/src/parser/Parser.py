@@ -70,7 +70,7 @@ class Parser:
             Parser.tokenizer.select_next()
             if Parser.tokenizer.next.type != "COMMA" and Parser.tokenizer.next.type != "RIGHTPARENTESIS":
                 raise Exception(
-                    f"Invalid Input Error: Expected ')' or ',' after function declaration. Got '{Parser.tokenizer.next.value}' instead.")
+                    f"Invalid Input Error: Expected ')' or ',' after function argument. Got '{Parser.tokenizer.next.value}' instead.")
             if Parser.tokenizer.next.type == "COMMA":
                 Parser.tokenizer.select_next()
         Parser.tokenizer.select_next()
@@ -134,7 +134,7 @@ class Parser:
                     children.append(Parser.parse_boolean_expression())
                     if Parser.tokenizer.next.type != "COMMA" and Parser.tokenizer.next.type != "RIGHTPARENTESIS":
                         raise Exception(
-                            f"Invalid Input Error: Expected ')' after function call. Got '{Parser.tokenizer.next.value}' instead.")
+                            f"Invalid Input Error: Expected ')' after function argument. Got '{Parser.tokenizer.next.value}' instead.")
                     if Parser.tokenizer.next.type == "COMMA":
                         Parser.tokenizer.select_next()
                 Parser.tokenizer.select_next()
@@ -306,7 +306,7 @@ class Parser:
                     children.append(Parser.parse_boolean_expression())
                     if Parser.tokenizer.next.type != "COMMA" and Parser.tokenizer.next.type != "RIGHTPARENTESIS":
                         raise Exception(
-                            f"Invalid Input Error: Expected ')' after function call. Got '{Parser.tokenizer.next.value}' instead.")
+                            f"Invalid Input Error: Expected ')' after function argument. Got '{Parser.tokenizer.next.value}' instead.")
                     if Parser.tokenizer.next.type == "COMMA":
                         Parser.tokenizer.select_next()
                 Parser.tokenizer.select_next()

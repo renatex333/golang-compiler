@@ -1,5 +1,5 @@
 
-; constantes
+; constants
 SYS_EXIT equ 1
 SYS_READ equ 3
 SYS_WRITE equ 4
@@ -11,12 +11,15 @@ False equ 0
 segment .data
 formatin: db "%d", 0
 formatout: db "%d", 10, 0 ; newline, null terminator
+formatinstr: db "%s", 0
+formatoutstr: db "%s", 10, 0 ; newline, null terminator
 scanint: times 4 db 0 ; 32-bit integer = 4 bytes
 
 segment .bss ; variables
 res RESB 1
 extern fflush
 extern stdout
+string_buffer RESB 64
 
 section .text
 global main ; linux
@@ -27,6 +30,9 @@ extern printf ; linux
 binop_je:
     JE binop_true
     JMP binop_false
+binop_jne:
+    JE binop_false
+    JMP binop_true
 binop_jg:
     JG binop_true
     JMP binop_false

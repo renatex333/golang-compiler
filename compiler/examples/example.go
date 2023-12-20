@@ -1,7 +1,9 @@
 var x int
 var y int
+
 x = 3+1
 y = x
+
 if x > 1 {
     x = 5-1
 }

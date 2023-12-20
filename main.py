@@ -8,9 +8,8 @@ def main(argv):
     root = Parser.run(filename=argv[1])
     symbol_table = SymbolTable()
     code_generator = CodeGen(filename=argv[1])
-    code_generator.start()
     root.evaluate(symbol_table, code_generator)
-    code_generator.finish()
+    code_generator.create_file()
 
 if __name__ == "__main__":
     main(sys.argv)
